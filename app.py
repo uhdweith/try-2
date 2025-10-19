@@ -7,10 +7,10 @@ from flask import Flask, jsonify
 app = Flask(__name__)
 
 # ====================
-# CONFIGURATION
+# CONFIGURATION (from environment variables)
 # ====================
-OPENWEATHER_API_KEY = "16037274ef3fce6f495951cc2dc203f9"
-DEEPSEEK_API_KEY = "sk-2d06dc99c35d4e35a0e2d25cb472d832"
+OPENWEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY")
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
 LOCATION = "Bengaluru"
 
 # ====================
@@ -80,9 +80,9 @@ def get_ai_insight(health_data, weather_data):
         if response.status_code == 200:
             return response.json()["choices"][0]["message"]["content"]
         else:
-            return f"AI API error ({response.status_code}) - returning simulated insight."
+            return f"AI API error ({response.status_code}) - returning fallback insight."
     except Exception as e:
-        return f"AI Exception: {str(e)} - returning simulated insight."
+        return f"AI Exception: {str(e)} - returning fallback insight."
 
 # ====================
 # FLASK ROUTE
@@ -104,8 +104,9 @@ def index():
     })
 
 # ====================
-# RUN APP LOCALLY
+# RUN APP (Render-ready)
 # ====================
 if __name__ == "__main__":
-    print("Starting Flask app on http://127.0.0.1:5000")
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"Starting Flask app on 0.0.0.0:{port}")
+    app.run(host="0.0.0.0", port=port)
